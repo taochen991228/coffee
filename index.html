@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>☕ 咖啡图库</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #faf5ef;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    color: #6f4e37;
+  }
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 10px;
+    width: 200px;
+  }
+  .card img {
+    width: 100%;
+    border-radius: 10px;
+  }
+  button {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border: none;
+    background: #6f4e37;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<h1>☕ 我的咖啡图库</h1>
+<div class="gallery" id="gallery"></div>
+
+<script>
+  const gallery = document.getElementById('gallery');
+  const folder = 'coffee_images';
+  const maxImages = 200; // 你可以根据数量调大，比如 200
+  const extensions = ['jpg', 'jpeg', 'png', 'webp']; // 支持多种格式
+
+  // 检查文件是否存在
+  async function checkImageExists(url) {
+    try {
+      const res = await fetch(url, { method: 'HEAD' });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  async function loadImages() {
+    for (let i = 1; i <= maxImages; i++) {
+      let found = false;
+      let imgPath = '';
+
+      for (const ext of extensions) {
+        const candidate = `${folder}/${i}.${ext}`;
+        const exists = await checkImageExists(candidate);
+        if (exists) {
+          found = true;
+          imgPath = candidate;
+          break;
+        }
+      }
+
+      if (!found) continue;
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      const img = document.createElement('img');
+      img.src = imgPath;
+      const btn = document.createElement('button');
+      btn.textContent = `下载 ${imgPath.split('/').pop()}`;
+      btn.onclick = () => {
+        const link = document.createElement('a');
+        link.href = imgPath;
+        link.download = imgPath.split('/').pop();
+        link.click();
+      };
+      card.appendChild(img);
+      card.appendChild(btn);
+      gallery.appendChild(card);
+    }
+  }
+
+  loadImages();
+</script>
+</body>
+</html>
